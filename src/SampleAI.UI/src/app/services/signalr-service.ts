@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
+import { IChatResponse } from '../chatbot/chat.response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
   private connection!: signalR.HubConnection;
-  private messageReceived = new Subject<string>();
+
+  private messageReceived = new Subject<IChatResponse>();
   messageReceived$ = this.messageReceived.asObservable();
+
   private conversationId = localStorage.getItem("conversationId") || this.generateConversationId();
 
   constructor() {
@@ -30,9 +33,8 @@ export class SignalRService {
   }
 
   private addReceiveMessageListener() {
-    this.connection.on('ReceiveMessageAsync', (message: string, conversationId: string) => {
-      const __ = conversationId; // will be use in the future
-      this.messageReceived.next(message);
+    this.connection.on('ReceiveMessageAsync', (chatRole: string, content: string, conversationId: string) => {
+      this.messageReceived.next({ chatRole, content, conversationId });
     });
   }
 
@@ -41,7 +43,10 @@ export class SignalRService {
       .catch(err => console.error(err));
   }
 
-  private generateConversationId() {
-    return Math.random().toString(36).substring(2, 15);
+  private generateConversationId(): string {
+    const conversationId = Math.random().toString(36).substring(2, 15);
+    localStorage.setItem("conversationId", conversationId);
+
+    return conversationId;
   }
 }

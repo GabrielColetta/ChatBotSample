@@ -1,7 +1,9 @@
 <div class="chat-window">
   <div class="messages">
-    <div *ngFor="let msg of messages" class="message">
-      {{ msg }}
+    <div *ngFor="let message of messages" class="message">
+      <label>{{ message.chatRole }}:</label>
+      <br />
+      <b>{{ message.content }}</b>
     </div>
   </div>
   <div class="input-area">

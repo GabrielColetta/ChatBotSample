@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SampleAI.Application\SampleAI.Application.csproj" />
     <ProjectReference Include="..\SampleAI.Infrastructure.MongoDB\SampleAI.Infrastructure.MongoDB.csproj" />
   </ItemGroup>
 

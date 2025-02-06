@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SignalRService } from '../services/signalr-service';
+import { IChatResponse } from './chat.response';
 
 @Component({
   standalone: false, 
@@ -7,14 +8,20 @@ import { SignalRService } from '../services/signalr-service';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-  messages: string[] = [];
+  messages: IChatResponse[] = [];
   messageToSend: string = '';
 
   constructor(private signalRService: SignalRService) { }
 
   ngOnInit(): void {
-    this.signalRService.messageReceived$.subscribe((message: string) => {
-      this.messages.push(message);
+    const total = this.messages.length;
+    this.signalRService.messageReceived$.subscribe((response: IChatResponse) => {
+      if (total === this.messages.length) {
+        this.messages.push(response);
+      }
+      else {
+        this.messages[total+1] = response;
+      }
     });
   }
 

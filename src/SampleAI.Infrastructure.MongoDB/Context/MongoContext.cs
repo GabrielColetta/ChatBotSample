@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Driver;
 using SampleAI.Shared.Constants;
 using SampleAI.Shared.Filters;
 using SampleAI.Shared.Interfaces;
@@ -12,6 +13,11 @@ public class MongoContext : IDatabaseContext
     public MongoContext(IMongoClient client)
     {
         Database = client.GetDatabase(GlobalVariables.InstanceName);
+        var pack = new ConventionPack
+        {
+            new IgnoreExtraElementsConvention(true)
+        };
+        ConventionRegistry.Register(nameof(MongoContext), pack, t => true);
     }
 
     public async Task InsertAsync<TDocument>(string name, TDocument document)

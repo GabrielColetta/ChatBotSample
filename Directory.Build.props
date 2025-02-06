@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>13.0</LangVersion>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SampleAI.Application.Tests" />
+  </ItemGroup>
+</Project>

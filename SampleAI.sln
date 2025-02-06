@@ -2,28 +2,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.AppHost", "SampleAI.AppHost\SampleAI.AppHost.csproj", "{FE6302B5-7666-4630-AA57-17847B1AAF6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.AppHost", "src\SampleAI.AppHost\SampleAI.AppHost.csproj", "{FE6302B5-7666-4630-AA57-17847B1AAF6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.ServiceDefaults", "SampleAI.ServiceDefaults\SampleAI.ServiceDefaults.csproj", "{36DBCC54-7CEC-4F97-8D73-2371355BFD53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.ServiceDefaults", "src\SampleAI.ServiceDefaults\SampleAI.ServiceDefaults.csproj", "{36DBCC54-7CEC-4F97-8D73-2371355BFD53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DDA8D0CC-9985-43E0-B6AB-1EBBE80C89E3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Shared", "SampleAI.Shared\SampleAI.Shared.csproj", "{0C99468B-A9DC-4D3C-94D9-47FCA377729B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Shared", "src\SampleAI.Shared\SampleAI.Shared.csproj", "{0C99468B-A9DC-4D3C-94D9-47FCA377729B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Infrastructure.MongoDB", "SampleAI.Infrastructure.MongoDB\SampleAI.Infrastructure.MongoDB.csproj", "{735BEB6E-414B-4A5D-A9B2-EF245E044159}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Infrastructure.MongoDB", "src\SampleAI.Infrastructure.MongoDB\SampleAI.Infrastructure.MongoDB.csproj", "{735BEB6E-414B-4A5D-A9B2-EF245E044159}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.IoC", "SampleAI.IoC\SampleAI.IoC.csproj", "{00D081F7-BD04-474C-8BB2-BEFE4F0BD9BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.IoC", "src\SampleAI.IoC\SampleAI.IoC.csproj", "{00D081F7-BD04-474C-8BB2-BEFE4F0BD9BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Api", "SampleAI.Api\SampleAI.Api.csproj", "{89059728-49B4-46E6-8C49-0BB588DF6D48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Api", "src\SampleAI.Api\SampleAI.Api.csproj", "{89059728-49B4-46E6-8C49-0BB588DF6D48}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SampleAI.UI", "SampleAI.UI\SampleAI.UI.esproj", "{ADAE526A-3A33-4B34-82B7-0F1AE4036A72}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "SampleAI.UI", "src\SampleAI.UI\SampleAI.UI.esproj", "{ADAE526A-3A33-4B34-82B7-0F1AE4036A72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Application", "src\SampleAI.Application\SampleAI.Application.csproj", "{84C0AC45-709E-4812-A528-4B21AC7DC8BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,8 +66,22 @@ Global
 		{ADAE526A-3A33-4B34-82B7-0F1AE4036A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADAE526A-3A33-4B34-82B7-0F1AE4036A72}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADAE526A-3A33-4B34-82B7-0F1AE4036A72}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{84C0AC45-709E-4812-A528-4B21AC7DC8BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84C0AC45-709E-4812-A528-4B21AC7DC8BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84C0AC45-709E-4812-A528-4B21AC7DC8BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84C0AC45-709E-4812-A528-4B21AC7DC8BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FE6302B5-7666-4630-AA57-17847B1AAF6D} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{36DBCC54-7CEC-4F97-8D73-2371355BFD53} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{0C99468B-A9DC-4D3C-94D9-47FCA377729B} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{735BEB6E-414B-4A5D-A9B2-EF245E044159} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{00D081F7-BD04-474C-8BB2-BEFE4F0BD9BE} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{89059728-49B4-46E6-8C49-0BB588DF6D48} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{ADAE526A-3A33-4B34-82B7-0F1AE4036A72} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{84C0AC45-709E-4812-A528-4B21AC7DC8BE} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
 	EndGlobalSection
 EndGlobal
