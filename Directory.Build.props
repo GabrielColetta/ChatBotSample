@@ -4,6 +4,6 @@
     <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="SampleAI.Application.Tests" />
+    <InternalsVisibleTo Include="SampleAI.Api.Tests" />
   </ItemGroup>
 </Project>

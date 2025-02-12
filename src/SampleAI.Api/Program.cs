@@ -3,7 +3,7 @@ using SampleAI.IoC.Extensions;
 using SampleAI.Shared.Constants;
 using Microsoft.Extensions.AI;
 
-internal class Program
+public class Program
 {
     private static async Task Main(string[] args)
     {

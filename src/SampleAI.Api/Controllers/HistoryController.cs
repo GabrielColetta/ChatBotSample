@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SampleAI.Api.Models.Requests;
+using SampleAI.Api.Models.Responses;
 using SampleAI.Shared.Filters;
 using SampleAI.Shared.Interfaces;
 using SampleAI.Shared.Models;
@@ -23,7 +24,7 @@ public class HistoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetHistoryAsync([FromQuery]GetHistoryRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetPaginatedAsync([FromQuery]GetHistoryRequest request, CancellationToken cancellationToken)
     {
         try
         {
@@ -35,7 +36,7 @@ public class HistoryController : ControllerBase
                     filterBy: x => x.ChatRole == "user");
             var paginatedResponse = await _databaseContext.GetSamplePaginatedAsync(ChatHistoryModel.DocumentName, paginateFilter, cancellationToken);
 
-            return Ok(paginatedResponse);
+            return Ok(HistoryResponse.From(paginatedResponse));
         }
         catch (Exception ex)
         {
@@ -45,7 +46,7 @@ public class HistoryController : ControllerBase
     }
 
     [HttpGet("{conversationId}")]
-    public async Task<IActionResult> GetChatHistoryAsync([FromRoute] string conversationId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByIdAsync([FromRoute] string conversationId, CancellationToken cancellationToken)
     {
         try
         {
@@ -56,7 +57,7 @@ public class HistoryController : ControllerBase
                     filterBy: x => x.ConversationId == conversationId);
             var paginatedResponse = await _databaseContext.GetPaginatedAsync(ChatHistoryModel.DocumentName, paginateFilter, cancellationToken);
 
-            return Ok(paginatedResponse);
+            return Ok(HistoryResponse.From(paginatedResponse));
         }
         catch (Exception ex)
         {
