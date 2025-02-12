@@ -4,6 +4,7 @@ public static class GlobalVariables
 {
     public const string Database = "mongo";
     public const string InstanceName = "sampleAi";
+    public const string ModelName = "ollama-deepseek-r1";
 
     public const string DatabaseName = "DATABASE_NAME";
     public const string DatabasePassword = "DATABASE_PASSWORD";

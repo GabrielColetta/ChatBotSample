@@ -1,10 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ChatComponent } from './chatbot/chat.component';
+import { ChatComponent } from './chat/chat.component';
+import { HistoryComponent } from './history/history.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
-    path: '', component: ChatComponent
+    path: '', component: HistoryComponent
+  },
+  {
+    path: 'chat', component: ChatComponent
+  },
+  {
+    path: 'chat/:conversationId', component: ChatComponent
   }];
 
 @NgModule({

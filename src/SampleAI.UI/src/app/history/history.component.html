@@ -1,0 +1,55 @@
+<p-breadcrumb class="max-w-full" [model]="items" />
+
+<p-toolbar>
+  <ng-template #center>
+    <p-iconfield iconPosition="left">
+      <p-inputicon styleClass="pi pi-search" />
+      <input type="text" pInputText placeholder="Search" aria-label="New chat" disabled />
+    </p-iconfield>
+  </ng-template>
+  <ng-template #end>
+    <p-button icon="pi pi-comment" class="mr-2" text label="New chat" (click)="newChat()" />
+  </ng-template>
+</p-toolbar>
+
+<p-table [value]="historic"
+         [paginator]="true"
+         [rows]="20"
+         [tableStyle]="{ 'min-width': '50rem' }"
+         [rowsPerPageOptions]="[20]">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Conversation Identifier</th>
+      <th>Last user message</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-historic>
+    <tr>
+      <td>{{ historic.conversationId }}</td>
+      <td>{{ historic.content }}</td>
+      <td>{{ historic.date }}</td>
+      <td>
+        <div class="flex items-center justify-center gap-2">
+          <button pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-check"
+                  (click)="continueChat(historic.conversationId)"
+                  text
+                  rounded
+                  severity="secondary"></button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td>There's no conversation to show.</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -1,4 +1,5 @@
 ﻿
+
 namespace SampleAI.Application.Services;
 
 public interface IChatService

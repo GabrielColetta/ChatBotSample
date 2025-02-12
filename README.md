@@ -1,4 +1,4 @@
-## Aspire Project using Olamma with DeekSeep model (14B), Angular, SignalR, and MongoDB
+## .NET Aspire project using Olamma with DeekSeep model (14B), Angular, SignalR, and MongoDB
 
 This is an example project that utilizes the .NET Aspire framework in combination with Olamma, Angular, SignalR for real-time communication, and MongoDB for historical data storage.
 

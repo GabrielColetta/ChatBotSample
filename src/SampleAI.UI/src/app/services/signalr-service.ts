@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { IChatResponse } from '../chatbot/chat.response';
+import { IChatResponse } from '../chat/chat.response';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,6 @@ export class SignalRService {
   private messageReceived = new Subject<IChatResponse>();
   messageReceived$ = this.messageReceived.asObservable();
 
-  private conversationId = localStorage.getItem("conversationId") || this.generateConversationId();
 
   constructor() {
     this.startConnection();
@@ -21,7 +21,7 @@ export class SignalRService {
 
   private startConnection() {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7252/chat', {
+      .withUrl(environment.webSocketUrl, {
         withCredentials: false
       })
       .build();
@@ -38,15 +38,8 @@ export class SignalRService {
     });
   }
 
-  public sendMessage(message: string) {
-    this.connection.invoke('SendMessageAsync', message, this.conversationId)
+  public sendMessage(message: string, conversationId: string) {
+    this.connection.invoke('SendMessageAsync', message, conversationId)
       .catch(err => console.error(err));
-  }
-
-  private generateConversationId(): string {
-    const conversationId = Math.random().toString(36).substring(2, 15);
-    localStorage.setItem("conversationId", conversationId);
-
-    return conversationId;
   }
 }

@@ -16,8 +16,6 @@ public class ChatHub : Hub<IChatHubClient>
 
     public async Task SendMessageAsync(string message, string conversationId)
     {
-        await Clients.All.ReceiveMessageAsync(ChatRole.User.ToString(), message, conversationId);
-
         await foreach (var contentMessage in _chatService.GenerateResponseAsync(message, conversationId))
         {
             await Clients.Caller.ReceiveMessageAsync(ChatRole.Assistant.ToString(), contentMessage, conversationId);

@@ -12,7 +12,18 @@ internal class Program
         builder.Services
             .AddDefaultServices()
             .AddLogging()
-            .AddCors(options => options.AddDefaultPolicy(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+            .AddCors(options => options
+                .AddDefaultPolicy(builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()));
+
+        builder.Services.AddControllers();
+        builder.Services.AddOpenApi();
+        builder.Services
+            .AddHealthChecks()
+            .AddMongoDb(GetMongoDBConnectionString(builder.Configuration))
+            .AddUrlGroup(CreateUri(), "model");
 
         builder.Services.AddSignalR();
         builder.Services.AddChatClient(x => new OllamaChatClient(CreateUri(), GetModel()).AsBuilder()
@@ -21,8 +32,17 @@ internal class Program
 
         var app = builder.Build();
 
-        app.UseCors();
+        app.UseCors()
+            .UseRouting()
+            .UseEndpoints(app => app.MapControllers())
+            .UseHealthChecks("/health");
+
         app.MapHub<ChatHub>("/chat");
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
+        }
 
         await app.RunAsync();
     }
@@ -30,6 +50,11 @@ internal class Program
     private static string GetModel()
     {
         return Environment.GetEnvironmentVariable(GlobalVariables.Model)!;
+    }
+
+    private static string GetMongoDBConnectionString(IConfiguration configuration)
+    {
+        return configuration.GetConnectionString(GlobalVariables.InstanceName)!;
     }
 
     private static Uri CreateUri()
