@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.AI;
+using SampleAI.Api.Extensions;
 using SampleAI.Application.Services;
 using SampleAI.Shared.Interfaces;
+using SampleAI.Shared.Models;
 
 namespace SampleAI.Api.Hubs;
 
@@ -14,11 +16,13 @@ public class ChatHub : Hub<IChatHubClient>
         _chatService = chatService;
     }
 
-    public async Task SendMessageAsync(string message, string conversationId)
+    public async IAsyncEnumerable<ChatHistoryResponse> SendMessageAsync(string message, string? conversationId)
     {
-        await foreach (var contentMessage in _chatService.GenerateResponseAsync(message, conversationId))
+        var date = DateTime.Now;
+        conversationId = conversationId.GenerateConversationId();
+        await foreach (var contentMessage in _chatService.GenerateResponseAsync(message, conversationId!, date))
         {
-            await Clients.Caller.ReceiveMessageAsync(ChatRole.Assistant.ToString(), contentMessage, conversationId);
-        };
+            yield return new ChatHistoryResponse(ChatRole.Assistant.ToString(), contentMessage, conversationId, date);
+        }
     }
 }

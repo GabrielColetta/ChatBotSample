@@ -3,6 +3,8 @@ using SampleAI.IoC.Extensions;
 using SampleAI.Shared.Constants;
 using Microsoft.Extensions.AI;
 
+namespace SampleAI.Api;
+
 public class Program
 {
     private static async Task Main(string[] args)
@@ -10,7 +12,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.AddDefaultApplications();
         builder.Services
-            .AddDefaultServices()
+            .AddApiServices(builder.Configuration)
             .AddLogging()
             .AddCors(options => options
                 .AddDefaultPolicy(builder => builder
@@ -25,7 +27,6 @@ public class Program
             .AddMongoDb(GetMongoDBConnectionString(builder.Configuration))
             .AddUrlGroup(CreateUri(), "model");
 
-        builder.Services.AddSignalR();
         builder.Services.AddChatClient(x => new OllamaChatClient(CreateUri(), GetModel()).AsBuilder()
             .UseOpenTelemetry()
             .Build(x));

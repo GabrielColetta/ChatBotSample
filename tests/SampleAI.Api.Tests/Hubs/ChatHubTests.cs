@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using SampleAI.Api.Hubs;
 using SampleAI.Shared.Interfaces;
-using System.Text;
+using SampleAI.Shared.Models;
 
 namespace SampleAI.Api.Tests.Hubs;
 
@@ -37,21 +37,13 @@ public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
             })
             .Build();
 
-        var stringBuilder = new StringBuilder();
-        var response = connection.On<string, string, string>(nameof(IChatHubClient.ReceiveMessageAsync), (chatRole, contentMessage, conversationId) =>
-        {
-            stringBuilder.Append(contentMessage);
-        });
-
         await connection.StartAsync();
 
         // When
-        await connection.InvokeAsync<string>(nameof(ChatHub.SendMessageAsync), content, conversationId);
-
-        await Task.Delay(2000);
+        var response = await connection.StreamAsync<ChatHistoryModel>("SendMessageAsync", content, conversationId).ToListAsync();
 
         // Then
-        stringBuilder.ToString().Should().Be("Hello there");
+        response.First().Content.Should().Be("Hello there");
     }
 
     private IEnumerable<StreamingChatCompletionUpdate> GetResponse()

@@ -1,0 +1,102 @@
+﻿@page "/chat"
+@page "/chat/{conversationId}"
+
+@using SampleAI.Shared.Interfaces
+@using SampleAI.Shared.Models
+
+<h1>Chat</h1>
+
+<div class="row">
+    <Breadcrumb Items="Breadcrumb"></Breadcrumb>
+</div>
+
+<div class="row">
+    @foreach (var message in ChatMessages)
+    {
+        <Callout HideHeading="true">
+            <h4>@message.ChatRole</h4>
+            <p>@message.Content</p>
+        </Callout>
+    }
+    @* <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="chat-box">
+                            @foreach (var message in ChatMessages)
+                            {
+                                <div class="message">
+                                    <div class="message-header">
+                                        <span>@message.ChatRole</span>
+                                    </div>
+                                    <div class="message-body">
+                                        <p>@message.Content</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> *@
+</div>
+
+<br />
+
+<div class="row">
+    <form method="post" @onsubmit="SubmitAsync" @formname="starship-plain-form">
+        <div>
+            <TextAreaInput @bind-Value="@EnteredText" Rows="12" MaxLength="200" />
+        </div>
+        <br />
+        <div>
+            <Button Color="ButtonColor.Success" To="#" Type="ButtonType.Submit">Send Message</Button>
+        </div>
+    </form>
+</div>
+
+@code {
+    private readonly IHttpService _httpService;
+    private readonly IWebSocketService _webSocketService;
+
+    private List<BreadcrumbItem> Breadcrumb { get; set; }
+    private List<ChatHistoryResponse> ChatMessages { get; set; } = [];
+    private string? EnteredText { get; set; }
+
+    [Parameter]
+    public string? ConversationId { get; set; }
+
+    public Chat(IHttpService httpService, IWebSocketService webSocketService)
+    {
+        Breadcrumb = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem{ Text = "Home", Href ="/" },
+            new BreadcrumbItem{ Text = "Chat", Href ="/chat" },
+        };
+        _httpService = httpService;
+        _webSocketService = webSocketService;
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(ConversationId))
+        {
+            var response = await _httpService.GetAsync<IEnumerable<ChatHistoryResponse>>($"api/history/{ConversationId}", CancellationToken.None);
+            ChatMessages = response?.ToList() ?? [];
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        ChatMessages.Add(new ChatHistoryResponse("User", EnteredText!, ConversationId, DateTime.Now));
+        ChatMessages.Add(new ChatHistoryResponse("Assistant", "...", ConversationId, DateTime.Now));
+        await foreach (var response in _webSocketService.ReceiveMessageAsync<ChatHistoryResponse>(EnteredText!, "", CancellationToken.None))
+        {
+            ChatMessages[^1] = response;
+        }
+    }
+}

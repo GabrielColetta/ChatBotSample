@@ -16,7 +16,6 @@ export class SignalRService {
 
   constructor() {
     this.startConnection();
-    this.addReceiveMessageListener();
   }
 
   private startConnection() {
@@ -32,14 +31,14 @@ export class SignalRService {
       .catch(err => console.error('Something went wrong: ' + err));
   }
 
-  private addReceiveMessageListener() {
-    this.connection.on('ReceiveMessageAsync', (chatRole: string, content: string, conversationId: string) => {
-      this.messageReceived.next({ chatRole, content, conversationId });
-    });
-  }
-
-  public sendMessage(message: string, conversationId: string) {
-    this.connection.invoke('SendMessageAsync', message, conversationId)
-      .catch(err => console.error(err));
+  public sendMessage(message: string, conversationId: string | null) {
+    this.connection.stream('SendMessageAsync', message, conversationId)
+      .subscribe({
+        next: (item: IChatResponse) => {
+          this.messageReceived.next(item);
+        },
+        complete: () => {},
+        error: (err) => console.error(err),
+      });
   }
 }

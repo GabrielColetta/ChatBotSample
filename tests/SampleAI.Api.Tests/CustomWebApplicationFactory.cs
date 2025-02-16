@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
@@ -25,7 +26,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         builder.ConfigureServices(services =>
         {
             services
-                .AddDefaultServices()
+                .AddApiServices(new ConfigurationBuilder().Build())
                 .Replace(new ServiceDescriptor
                 (
                     serviceType: typeof(IMongoClient),

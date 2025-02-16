@@ -1,7 +1,8 @@
-﻿namespace SampleAI.Shared.Interfaces;
+﻿using SampleAI.Shared.Models;
+
+namespace SampleAI.Shared.Interfaces;
 
 public interface IChatHubClient
 {
-    Task ReceiveMessageAsync(string user, string content, string conversationId);
-    Task<string> GetMessageAsync();
+    IAsyncEnumerable<ChatHistoryResponse> ReceiveMessageAsync(string message, string conversationId);
 }

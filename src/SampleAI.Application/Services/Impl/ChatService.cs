@@ -20,10 +20,8 @@ public class ChatService : IChatService
         _databaseContext = databaseContext;
     }
 
-    public async IAsyncEnumerable<string> GenerateResponseAsync(string message, string conversationId)
+    public async IAsyncEnumerable<string> GenerateResponseAsync(string message, string conversationId, DateTime timestamp)
     {
-        var timestamp = DateTime.Now;
-
         await UpdateChatHistoryAsync(ChatRole.User, conversationId, timestamp, message);
         var chatHistories = await GetChatMessagesAsync(conversationId);
 

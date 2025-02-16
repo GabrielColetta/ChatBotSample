@@ -1,0 +1,76 @@
+﻿@page "/"
+
+@using SampleAI.Shared.Interfaces
+@using SampleAI.Shared.Models
+@inject NavigationManager Navigation
+
+<h1>History</h1>
+
+<div class="row">
+    <Breadcrumb Items="Breadcrumb"></Breadcrumb>
+</div>
+
+<div class="row">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
+        <Button Color="ButtonColor.Success" Size="ButtonSize.Medium" To="#" Type="ButtonType.Link" @onclick="@(() => Navigation.NavigateTo("chat"))">New chat</Button>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <Grid TItem="ChatHistoryResponse"
+          Class="table table-hover table-bordered table-striped"
+          DataProvider="GetChatHistoryDataProvider"
+          AllowFiltering="false"
+          AllowPaging="true"
+          PageSize="5"
+          AllowSorting="false"
+          AllowSelection="false"
+          Responsive="true">
+        <GridColumns>
+            <GridColumn TItem="ChatHistoryResponse" HeaderText="Conversation Identifier" PropertyName="Name">
+                @context.ConversationId
+            </GridColumn>
+            <GridColumn TItem="ChatHistoryResponse" HeaderText="Last user message" PropertyName="Designation">
+                @context.Content
+            </GridColumn>
+            <GridColumn TItem="ChatHistoryResponse" HeaderText="Date" PropertyName="DOJ">
+                @context.Date
+            </GridColumn>
+            <GridColumn TItem="ChatHistoryResponse" HeaderText="Actions" PropertyName="Actions">
+                <Button Color="ButtonColor.Primary" Size="ButtonSize.Small" To="#" Type="ButtonType.Link" @onclick="@(() => Navigation.NavigateTo($"chat/{@context.ConversationId}"))">
+                    <Tooltip Title="Continue chat" role="button">
+                        <Icon Name="IconName.BoxArrowInRight" />
+                    </Tooltip>
+                </Button>
+            </GridColumn>
+        </GridColumns>
+    </Grid>
+</div>
+
+@code {
+    private readonly IHttpService _httpService;
+    private List<BreadcrumbItem> Breadcrumb { get; set; }
+    private IEnumerable<ChatHistoryResponse> ChatHistory = default!;
+
+    [Parameter]
+    public string? ConversationId { get; set; }
+
+    public History(IHttpService httpService)
+    {
+        Breadcrumb = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem{ Text = "Home", Href ="/" },
+        };
+        _httpService = httpService;
+    }
+
+    private async Task<GridDataProviderResult<ChatHistoryResponse>> GetChatHistoryDataProvider(GridDataProviderRequest<ChatHistoryResponse> request)
+    {
+        var response = await _httpService.GetAsync<PaginatedResponse<ChatHistoryResponse>>("api/history", CancellationToken.None);
+        ChatHistory = response?.Data ?? [];
+
+        return request.ApplyTo(ChatHistory);
+    }
+}

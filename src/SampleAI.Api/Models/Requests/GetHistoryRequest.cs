@@ -2,6 +2,6 @@
 
 public class GetHistoryRequest
 {
-    public uint PerPage { get; set; }
-    public uint CurrentPage { get; set; }
+    public uint PerPage { get; set; } = 20;
+    public uint CurrentPage { get; set; } = 0;
 }
