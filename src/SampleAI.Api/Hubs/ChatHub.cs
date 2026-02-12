@@ -1,28 +1,23 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.AI;
+﻿using System.Threading.Channels;
+using Microsoft.AspNetCore.SignalR;
 using SampleAI.Api.Extensions;
-using SampleAI.Application.Services;
-using SampleAI.Shared.Interfaces;
 using SampleAI.Shared.Models;
 
 namespace SampleAI.Api.Hubs;
 
-public class ChatHub : Hub<IChatHubClient>
+public class ChatHub : Hub
 {
-    private readonly IChatService _chatService;
+    private readonly ChannelWriter<ChatMessageRequest> _channelWriter;
 
-    public ChatHub(IChatService chatService)
+    public ChatHub(ChannelWriter<ChatMessageRequest> channelWriter)
     {
-        _chatService = chatService;
+        _channelWriter = channelWriter;
     }
 
-    public async IAsyncEnumerable<ChatHistoryResponse> SendMessageAsync(string message, string? conversationId)
+    public async Task SendMessageAsync(string userPrompt, string? conversationId)
     {
-        var date = DateTime.Now;
-        conversationId = conversationId.GenerateConversationId();
-        await foreach (var contentMessage in _chatService.GenerateResponseAsync(message, conversationId!, date))
-        {
-            yield return new ChatHistoryResponse(ChatRole.Assistant.ToString(), contentMessage, conversationId, date);
-        }
+        var request = new ChatMessageRequest(Context.ConnectionId, conversationId.GenerateConversationId(), userPrompt);
+        
+        await _channelWriter.WriteAsync(request);
     }
 }

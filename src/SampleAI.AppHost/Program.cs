@@ -3,6 +3,8 @@ using SampleAI.AppHost.Configurations;
 using SampleAI.AppHost.Constants;
 using SampleAI.Shared.Constants;
 
+namespace SampleAI.AppHost;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -18,8 +20,8 @@ internal class Program
             .WithDataVolume()
             .AddModel(languageModelConfiguration.Model);
 
-        var password = builder.AddParameter(AppHostNames.Password, secret: true);
-        var mongoDb = builder.AddMongoDB(GlobalVariables.Database, password: password)
+        var mongoDb = builder.AddMongoDB(GlobalVariables.Database)
+            .WithImage(GlobalVariables.DatabaseImage)
             .WithLifetime(ContainerLifetime.Persistent)
             .WithDataVolume()
             .AddDatabase(GlobalVariables.InstanceName);
@@ -32,12 +34,10 @@ internal class Program
             .WithEnvironment(GlobalVariables.Port, languageModelConfiguration.Port.ToString())
             .WithEnvironment(GlobalVariables.Model, languageModelConfiguration.Model);
 
-        builder.AddNpmApp(AppHostNames.UI, "../SampleAI.UI")
+        builder.AddJavaScriptApp(AppHostNames.UI, "../SampleAI.UI", "start")
             .WithReference(api)
             .WaitFor(api)
-            .WithExternalHttpEndpoints()
-            .WithExternalHttpEndpoints()
-            .PublishAsDockerFile();
+            .WithExternalHttpEndpoints();
 
         builder.Build().Run();
     }

@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using SampleAI.Api.Hubs;
-using SampleAI.Shared.Interfaces;
 using SampleAI.Shared.Models;
 
 namespace SampleAI.Api.Tests.Hubs;
-
+ 
 public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
@@ -22,37 +20,41 @@ public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
 
     [Theory]
     [AutoData]
-    public async Task Should_ReturnNewContent_When_GetHistoryAsync(string content, string conversationId)
+    public async Task Should_ReturnNewContent_When_GetHistoryAsync(string userPrompt, string conversationId)
     {
-        // Given
         await using var scoped = _factory.Services.CreateAsyncScope();
         var chatHistoryMock = scoped.ServiceProvider.GetRequiredService<IChatClient>();
-        chatHistoryMock.CompleteStreamingAsync(Arg.Any<IList<ChatMessage>>())
+        chatHistoryMock.GetStreamingResponseAsync(Arg.Any<IList<ChatMessage>>(), cancellationToken: Arg.Any<CancellationToken>())
             .Returns(GetResponse().ToAsyncEnumerable());
 
         var connection = new HubConnectionBuilder()
-            .WithUrl("wss://localhost/chat", options =>
+            .WithUrl("http://localhost/chat", options =>
             {
                 options.HttpMessageHandlerFactory = _ => _factory.Server.CreateHandler();
+                options.Transports = Microsoft.AspNetCore.Http.Connections.HttpTransportType.ServerSentEvents;
             })
             .Build();
 
+        var response = string.Empty;
+        connection.On<ChatHistoryModel>("ReceiveToken", r =>
+        {
+            response += r.Content;
+        });
+
         await connection.StartAsync();
 
-        // When
-        var response = await connection.StreamAsync<ChatHistoryModel>("SendMessageAsync", content, conversationId).ToListAsync();
+        await connection.InvokeAsync("SendMessageAsync", userPrompt, conversationId);
 
-        // Then
-        response.First().Content.Should().Be("Hello there");
+        await Task.Delay(2000);
+
+        response.Should().Be("Hello there");
     }
 
-    private IEnumerable<StreamingChatCompletionUpdate> GetResponse()
+    private static IEnumerable<ChatResponseUpdate> GetResponse()
     {
         return
         [
-            new() {
-                Text = "Hello there"
-            }
+            new ChatResponseUpdate(ChatRole.Assistant, "Hello there")
         ];
     }
 }

@@ -1,7 +1,11 @@
+using System.Threading.Channels;
 using SampleAI.Api.Hubs;
 using SampleAI.IoC.Extensions;
 using SampleAI.Shared.Constants;
 using Microsoft.Extensions.AI;
+using OllamaSharp;
+using SampleAI.Api.Workers;
+using SampleAI.Shared.Models;
 
 namespace SampleAI.Api;
 
@@ -15,7 +19,7 @@ public class Program
             .AddApiServices(builder.Configuration)
             .AddLogging()
             .AddCors(options => options
-                .AddDefaultPolicy(builder => builder
+                .AddDefaultPolicy(b => b
                     .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()));
@@ -24,21 +28,31 @@ public class Program
         builder.Services.AddOpenApi();
         builder.Services
             .AddHealthChecks()
-            .AddMongoDb(GetMongoDBConnectionString(builder.Configuration))
+            .AddMongoDb()
             .AddUrlGroup(CreateUri(), "model");
 
-        builder.Services.AddChatClient(x => new OllamaChatClient(CreateUri(), GetModel()).AsBuilder()
+        builder.Services.AddChatClient(x => new ChatClientBuilder(new OllamaApiClient(CreateUri(), GetModel()))
             .UseOpenTelemetry()
             .Build(x));
+        
+        builder.Services.AddSingleton(Channel.CreateBounded<ChatMessageRequest>(new BoundedChannelOptions(100)
+        {
+            FullMode = BoundedChannelFullMode.Wait
+        }));
+        builder.Services.AddSingleton(sp => sp.GetRequiredService<Channel<ChatMessageRequest>>().Reader);
+        builder.Services.AddSingleton(sp => sp.GetRequiredService<Channel<ChatMessageRequest>>().Writer);
+
+        builder.Services.AddHostedService<ChatProcessorWorker>();
 
         var app = builder.Build();
 
         app.UseCors()
             .UseRouting()
-            .UseEndpoints(app => app.MapControllers())
+            .UseEndpoints(a => a.MapControllers())
             .UseHealthChecks("/health");
 
         app.MapHub<ChatHub>("/chat");
+        
 
         if (app.Environment.IsDevelopment())
         {
@@ -51,11 +65,6 @@ public class Program
     private static string GetModel()
     {
         return Environment.GetEnvironmentVariable(GlobalVariables.Model)!;
-    }
-
-    private static string GetMongoDBConnectionString(IConfiguration configuration)
-    {
-        return configuration.GetConnectionString(GlobalVariables.InstanceName)!;
     }
 
     private static Uri CreateUri()

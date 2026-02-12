@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.AI;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.AI;
 using SampleAI.Shared.Filters;
 using SampleAI.Shared.Interfaces;
 using SampleAI.Shared.Models;
@@ -20,19 +21,16 @@ public class ChatService : IChatService
         _databaseContext = databaseContext;
     }
 
-    public async IAsyncEnumerable<string> GenerateResponseAsync(string message, string conversationId, DateTime timestamp)
+    public async IAsyncEnumerable<string> GenerateResponseAsync(string message, string conversationId, DateTime timestamp, [EnumeratorCancellation]CancellationToken cancellationToken)
     {
         await UpdateChatHistoryAsync(ChatRole.User, conversationId, timestamp, message);
         var chatHistories = await GetChatMessagesAsync(conversationId);
 
         var messageBuilder = new StringBuilder();
-        await foreach (var response in _chatClient.CompleteStreamingAsync(chatHistories))
+        await foreach (var response in _chatClient.GetStreamingResponseAsync(chatHistories, cancellationToken: cancellationToken))
         {
-            if (response?.Contents != null)
-            {
                 messageBuilder.Append(response.Text);
                 yield return messageBuilder.ToString();
-            }
         }
 
         if (messageBuilder.Length > 0)

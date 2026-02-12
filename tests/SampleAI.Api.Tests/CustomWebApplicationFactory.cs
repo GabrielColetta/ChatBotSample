@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Driver;
 using NSubstitute;
 using SampleAI.IoC.Extensions;
+using SampleAI.Shared.Constants;
 using Testcontainers.MongoDb;
 
 namespace SampleAI.Api.Tests;
@@ -14,7 +15,7 @@ namespace SampleAI.Api.Tests;
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>
     where TProgram : class
 {
-    private readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder().Build();
+    private readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder(GlobalVariables.DatabaseImage).Build();
 
     public CustomWebApplicationFactory()
     {
@@ -44,10 +45,11 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         builder.UseEnvironment("Development");
     }
 
-    public async override ValueTask DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await _mongoDbContainer.StopAsync();
         await _mongoDbContainer.DisposeAsync();
         await base.DisposeAsync();
+        GC.SuppressFinalize(this);
     }
 }

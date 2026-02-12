@@ -25,20 +25,19 @@ export class SignalRService {
       })
       .build();
 
+    this.connection.on('ReceiveToken', (item: IChatResponse) => {
+      this.messageReceived.next(item);
+    });
+
     this.connection
       .start()
       .then(() => console.info('Start connection...'))
       .catch(err => console.error('Something went wrong: ' + err));
   }
 
-  public sendMessage(message: string, conversationId: string | null) {
-    this.connection.stream('SendMessageAsync', message, conversationId)
-      .subscribe({
-        next: (item: IChatResponse) => {
-          this.messageReceived.next(item);
-        },
-        complete: () => {},
-        error: (err) => console.error(err),
-      });
+  public sendMessage(userPrompt: string, conversationId: string | null) {
+    this.connection
+      .invoke('SendMessageAsync', userPrompt, conversationId)
+      .catch(err => console.error('Invoke failed: ' + err));
   }
 }
