@@ -1,5 +1,5 @@
 export interface HistoryResponse {
-  message: string;
-  conversationId: string;
+  chatId: string;
+  title: string;
   date: string;
 }

@@ -1,7 +1,6 @@
-﻿using System.Threading.Channels;
-using Microsoft.AspNetCore.SignalR;
-using SampleAI.Api.Extensions;
+﻿using Microsoft.AspNetCore.SignalR;
 using SampleAI.Shared.Models;
+using System.Threading.Channels;
 
 namespace SampleAI.Api.Hubs;
 
@@ -14,10 +13,10 @@ public class ChatHub : Hub
         _channelWriter = channelWriter;
     }
 
-    public async Task SendMessageAsync(string userPrompt, string? conversationId)
+    public async Task SendMessageAsync(string userPrompt, Guid? chatId)
     {
-        var request = new ChatMessageRequest(Context.ConnectionId, conversationId.GenerateConversationId(), userPrompt);
-        
+        var request = new ChatMessageRequest(Context.ConnectionId, chatId, userPrompt);
+
         await _channelWriter.WriteAsync(request);
     }
 }

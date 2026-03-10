@@ -11,8 +11,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDatabaseServices()
-            .AddChatService()
+        services.AddDatabaseServices(configuration)
+            .AddApplicationServices()
             .AddWebSocket();
 
         return services;

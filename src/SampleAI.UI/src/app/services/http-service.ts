@@ -17,4 +17,8 @@ export class HttpService {
   getById(endpoint: string, id: string): Observable<any> {
     return this.http.get(`${environment.apiUrl}/${endpoint}/${id}`);
   }
+
+  search(endpoint: string, search: string): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/${endpoint}?search=${encodeURIComponent(search)}`);
+  }
 }

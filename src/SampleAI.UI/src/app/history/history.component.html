@@ -2,10 +2,12 @@
 
 <p-toolbar>
   <ng-template #center>
-    <p-iconfield iconPosition="left">
-      <p-inputicon styleClass="pi pi-search" />
-      <input type="text" pInputText placeholder="Search" aria-label="New chat" disabled />
-    </p-iconfield>
+    <div class="flex items-center gap-4">
+      <p-iconfield iconPosition="left">
+        <p-inputicon styleClass="pi pi-search" />
+        <input type="text" pInputText placeholder="Search History" (input)="onSearch($event)" />
+      </p-iconfield>
+    </div>
   </ng-template>
   <ng-template #end>
     <p-button icon="pi pi-comment" class="mr-2" text label="New chat" (click)="newChat()" />
@@ -27,8 +29,8 @@
   </ng-template>
   <ng-template pTemplate="body" let-historic>
     <tr>
-      <td>{{ historic.conversationId }}</td>
-      <td>{{ historic.content }}</td>
+      <td>{{ historic.chatId }}</td>
+      <td>{{ historic.title }}</td>
       <td>{{ historic.date }}</td>
       <td>
         <div class="flex items-center justify-center gap-2">
@@ -36,7 +38,7 @@
                   pRipple
                   type="button"
                   icon="pi pi-check"
-                  (click)="continueChat(historic.conversationId)"
+                  (click)="continueChat(historic.chatId)"
                   text
                   rounded
                   severity="secondary"></button>

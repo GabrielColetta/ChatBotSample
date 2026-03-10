@@ -1,3 +1,3 @@
 ﻿namespace SampleAI.Shared.Models;
 
-public record PaginatedResponse<TModel>(IEnumerable<TModel> Data, uint PerPage, uint CurrentPage, uint TotalItems);
+public record PaginatedResponse<TModel>(IEnumerable<TModel> Data, int PerPage, int CurrentPage, int TotalItems);

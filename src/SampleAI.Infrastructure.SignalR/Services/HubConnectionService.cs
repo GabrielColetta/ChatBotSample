@@ -29,10 +29,10 @@ public sealed class HubConnectionService : IWebSocketService
 
     public async IAsyncEnumerable<TResponse> ReceiveMessageAsync<TResponse>(
         string content,
-        string conversationId,
+        string chatId,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        await foreach (var response in _connection.StreamAsync<TResponse>("SendMessageAsync", content, conversationId, cancellationToken))
+        await foreach (var response in _connection.StreamAsync<TResponse>("SendMessageAsync", content, chatId, cancellationToken))
         {
             yield return response;
         }

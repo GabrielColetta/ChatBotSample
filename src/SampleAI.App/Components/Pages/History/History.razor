@@ -30,7 +30,7 @@
           Responsive="true">
         <GridColumns>
             <GridColumn TItem="ChatHistoryResponse" HeaderText="Conversation Identifier" PropertyName="Name">
-                @context.ConversationId
+                @context.ChatId
             </GridColumn>
             <GridColumn TItem="ChatHistoryResponse" HeaderText="Last user message" PropertyName="Designation">
                 @context.Content
@@ -39,7 +39,7 @@
                 @context.Date
             </GridColumn>
             <GridColumn TItem="ChatHistoryResponse" HeaderText="Actions" PropertyName="Actions">
-                <Button Color="ButtonColor.Primary" Size="ButtonSize.Small" To="#" Type="ButtonType.Link" @onclick="@(() => Navigation.NavigateTo($"chat/{@context.ConversationId}"))">
+                <Button Color="ButtonColor.Primary" Size="ButtonSize.Small" To="#" Type="ButtonType.Link" @onclick="@(() => Navigation.NavigateTo($"chat/{@context.ChatId}"))">
                     <Tooltip Title="Continue chat" role="button">
                         <Icon Name="IconName.BoxArrowInRight" />
                     </Tooltip>

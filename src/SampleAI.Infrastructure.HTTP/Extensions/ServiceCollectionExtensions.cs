@@ -14,13 +14,14 @@ public static class ServiceCollectionExtensions
     {
         var httpConfiguration = configuration.GetRequiredSection("http").Get<HttpConfiguration>();
 
-        services.AddHttpClient<IHttpService, HttpService>(client =>
+        services
+            .AddHttpClient<IHttpService, HttpService>(client =>
             {
                 client.BaseAddress = new Uri(httpConfiguration!.BaseUrl);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
-            //.SetHandlerLifetime(TimeSpan.FromMinutes(5))
-            //.AddPolicyHandler(GetRetryPolicy());
+            })
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddPolicyHandler(GetRetryPolicy());
         return services;
     }
 

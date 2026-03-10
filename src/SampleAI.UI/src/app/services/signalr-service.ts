@@ -35,9 +35,9 @@ export class SignalRService {
       .catch(err => console.error('Something went wrong: ' + err));
   }
 
-  public sendMessage(userPrompt: string, conversationId: string | null) {
+  public sendMessage(userPrompt: string, chatId: string | null) {
     this.connection
-      .invoke('SendMessageAsync', userPrompt, conversationId)
+      .invoke('SendMessageAsync', userPrompt, chatId)
       .catch(err => console.error('Invoke failed: ' + err));
   }
 }

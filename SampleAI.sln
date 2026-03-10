@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11505.172 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.AppHost", "src\SampleAI.AppHost\SampleAI.AppHost.csproj", "{FE6302B5-7666-4630-AA57-17847B1AAF6D}"
 EndProject
@@ -39,6 +39,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Infrastructure.HTTP", "src\SampleAI.Infrastructure.HTTP\SampleAI.Infrastructure.HTTP.csproj", "{2284A430-5762-4F5F-8E93-F1F0E1029BFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.App", "src\SampleAI.App\SampleAI.App.csproj", "{A594747F-56DC-4E45-84AA-F2B334681E4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleAI.Domain", "src\SampleAI.Domain\SampleAI.Domain.csproj", "{45D8AEDC-4FE7-46C4-B9A6-F361AB858BEF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,10 @@ Global
 		{A594747F-56DC-4E45-84AA-F2B334681E4D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{A594747F-56DC-4E45-84AA-F2B334681E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A594747F-56DC-4E45-84AA-F2B334681E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45D8AEDC-4FE7-46C4-B9A6-F361AB858BEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45D8AEDC-4FE7-46C4-B9A6-F361AB858BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45D8AEDC-4FE7-46C4-B9A6-F361AB858BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45D8AEDC-4FE7-46C4-B9A6-F361AB858BEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +120,7 @@ Global
 		{F256ED24-F6DF-4A58-829A-EE92C2DC9E9B} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
 		{2284A430-5762-4F5F-8E93-F1F0E1029BFF} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
 		{A594747F-56DC-4E45-84AA-F2B334681E4D} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
+		{45D8AEDC-4FE7-46C4-B9A6-F361AB858BEF} = {BEB0FBBD-55DD-4FEC-9620-86F82D5C2003}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D792EE7-D35C-4061-ADA3-AD79EA9BB22E}

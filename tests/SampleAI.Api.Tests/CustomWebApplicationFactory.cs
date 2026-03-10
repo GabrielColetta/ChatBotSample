@@ -1,39 +1,55 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using MongoDB.Driver;
 using NSubstitute;
-using SampleAI.IoC.Extensions;
+using SampleAI.Shared.Configurations;
 using SampleAI.Shared.Constants;
 using Testcontainers.MongoDb;
+using Testcontainers.Ollama;
 
 namespace SampleAI.Api.Tests;
 
-public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>
+public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime
     where TProgram : class
 {
-    private readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder(GlobalVariables.DatabaseImage).Build();
+    private static readonly string _localModelsPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "OllamaTestContainer",
+        "models");
 
-    public CustomWebApplicationFactory()
-    {
-        _mongoDbContainer.StartAsync().GetAwaiter().GetResult();
-    }
+    private static readonly ModelConfiguration _languageModelConfiguration = new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.Tests.json", optional: false, reloadOnChange: true)
+        .Build()
+        .GetSection(ModelConfiguration.SectionName)
+        .Get<ModelConfiguration>()!;
+
+    private static readonly MongoDbContainer _mongoDbContainer = new MongoDbBuilder(GlobalVariables.DatabaseImage)
+        .WithEnvironment("MONGODB_INITDB_ROOT_USERNAME", "mongo")
+        .WithEnvironment("MONGODB_INITDB_ROOT_PASSWORD", "mongo")
+        .Build();
+
+    private static readonly OllamaContainer _ollamaContainer = new OllamaBuilder("ollama/ollama:latest")
+        .WithBindMount(_localModelsPath, "/root/.ollama")
+        .Build();
+
+    private static bool _initialized = false;
+    private static readonly SemaphoreSlim _semaphore = new(1, 1);
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        Environment.SetEnvironmentVariable($"ConnectionStrings:{GlobalVariables.DatabaseName}", _mongoDbContainer.GetConnectionString());
+        Environment.SetEnvironmentVariable($"ConnectionStrings:{GlobalVariables.EmbeddingModel}", GetConnectionString());
+        Environment.SetEnvironmentVariable(GlobalVariables.EmbeddingModel, _languageModelConfiguration.EmbeddingModel);
+        Environment.SetEnvironmentVariable(GlobalVariables.Model, _languageModelConfiguration.Model);
+
+        builder.ConfigureTestServices(services =>
         {
             services
-                .AddApiServices(new ConfigurationBuilder().Build())
-                .Replace(new ServiceDescriptor
-                (
-                    serviceType: typeof(IMongoClient),
-                    factory: _ => new MongoClient(_mongoDbContainer.GetConnectionString()),
-                    lifetime: ServiceLifetime.Singleton
-                ))
                 .Replace(new ServiceDescriptor
                 (
                     serviceType: typeof(IChatClient),
@@ -47,9 +63,42 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
 
     public override async ValueTask DisposeAsync()
     {
-        await _mongoDbContainer.StopAsync();
-        await _mongoDbContainer.DisposeAsync();
         await base.DisposeAsync();
-        GC.SuppressFinalize(this);
+    }
+
+    public async ValueTask InitializeAsync()
+    {
+        await _semaphore.WaitAsync();
+        try
+        {
+            if (_initialized)
+            {
+                return;
+            }
+
+            if (!Directory.Exists(_localModelsPath))
+            {
+                Directory.CreateDirectory(_localModelsPath);
+            }
+
+            await _mongoDbContainer.StartAsync();
+            await _ollamaContainer.StartAsync();
+
+            await _ollamaContainer.ExecAsync(["ollama", "pull", _languageModelConfiguration.EmbeddingModel]);
+
+
+            _initialized = true;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    private static string GetConnectionString()
+    {
+        var host = _ollamaContainer.Hostname;
+        var port = _ollamaContainer.GetMappedPublicPort(11434);
+        return $"Endpoint=http://{host}:{port};Model={_languageModelConfiguration.EmbeddingModel}";
     }
 }

@@ -1,9 +1,8 @@
-﻿
-
+﻿using SampleAI.Shared.Models;
 
 namespace SampleAI.Application.Services;
 
 public interface IChatService
 {
-    IAsyncEnumerable<string> GenerateResponseAsync(string message, string conversationId, DateTime timestamp, CancellationToken cancellationToken);
+    IAsyncEnumerable<ChatHistoryResponse> GenerateResponseAsync(Guid? chatId, string content, CancellationToken cancellationToken);
 }

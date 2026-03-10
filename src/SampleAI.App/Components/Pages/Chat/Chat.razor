@@ -92,8 +92,8 @@
 
     private async Task SubmitAsync()
     {
-        ChatMessages.Add(new ChatHistoryResponse("User", EnteredText!, ConversationId, DateTime.Now));
-        ChatMessages.Add(new ChatHistoryResponse("Assistant", "...", ConversationId, DateTime.Now));
+        ChatMessages.Add(new ChatHistoryResponse("User", EnteredText!, ConversationId!, DateTime.Now));
+        ChatMessages.Add(new ChatHistoryResponse("Assistant", "", ConversationId!, DateTime.Now));
         await foreach (var response in _webSocketService.ReceiveMessageAsync<ChatHistoryResponse>(EnteredText!, "", CancellationToken.None))
         {
             ChatMessages[^1] = response;

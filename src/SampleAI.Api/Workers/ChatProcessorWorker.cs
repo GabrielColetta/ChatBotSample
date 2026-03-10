@@ -1,10 +1,9 @@
-﻿using System.Threading.Channels;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.AI;
-using SampleAI.Api.Extensions;
 using SampleAI.Api.Hubs;
 using SampleAI.Application.Services;
 using SampleAI.Shared.Models;
+using System.Threading.Channels;
 
 namespace SampleAI.Api.Workers;
 
@@ -16,7 +15,7 @@ public class ChatProcessorWorker : BackgroundService
     private readonly ILogger<ChatProcessorWorker> _logger;
 
     public ChatProcessorWorker(
-        ChannelReader<ChatMessageRequest> channelReader, 
+        ChannelReader<ChatMessageRequest> channelReader,
         IHubContext<ChatHub> hubContext,
         IServiceScopeFactory serviceScopeFactory,
         ILogger<ChatProcessorWorker> logger)
@@ -29,19 +28,15 @@ public class ChatProcessorWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        using var scope = _serviceScopeFactory.CreateScope();
-        var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
-
         await foreach (var request in _channelReader.ReadAllAsync(cancellationToken))
         {
             try
             {
-                var date = DateTime.Now;
-                var conversationId = request.ConversationId.GenerateConversationId();
-                await foreach (var contentMessage in chatService.GenerateResponseAsync(request.UserPrompt, conversationId, date, cancellationToken))
-                {
-                    var response = new ChatHistoryResponse(ChatRole.Assistant.ToString(), contentMessage, conversationId, date);
+                using var scope = _serviceScopeFactory.CreateScope();
+                var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
 
+                await foreach (var response in chatService.GenerateResponseAsync(request.ChatId, request.UserPrompt, cancellationToken))
+                {
                     await _hubContext.Clients.Client(request.ConnectionId).SendAsync("ReceiveToken", response, cancellationToken);
                 }
             }

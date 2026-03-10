@@ -1,14 +1,15 @@
-﻿using AutoFixture.Xunit2;
+﻿using AutoFixture.Xunit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using SampleAI.Shared.Models;
+using SampleAI.Api.Models.Responses;
 
 namespace SampleAI.Api.Tests.Hubs;
- 
+
+[Collection("Tests")]
 public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
@@ -20,7 +21,7 @@ public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
 
     [Theory]
     [AutoData]
-    public async Task Should_ReturnNewContent_When_GetHistoryAsync(string userPrompt, string conversationId)
+    public async Task Should_ReturnNewContent_When_GetHistoryAsync(string userPrompt, Guid conversationId)
     {
         await using var scoped = _factory.Services.CreateAsyncScope();
         var chatHistoryMock = scoped.ServiceProvider.GetRequiredService<IChatClient>();
@@ -36,16 +37,16 @@ public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
             .Build();
 
         var response = string.Empty;
-        connection.On<ChatHistoryModel>("ReceiveToken", r =>
+        connection.On<HistoryResponse>("ReceiveToken", r =>
         {
             response += r.Content;
         });
 
-        await connection.StartAsync();
+        await connection.StartAsync(CancellationToken.None);
 
-        await connection.InvokeAsync("SendMessageAsync", userPrompt, conversationId);
+        await connection.InvokeAsync("SendMessageAsync", userPrompt, conversationId, CancellationToken.None);
 
-        await Task.Delay(2000);
+        await Task.Delay(2000, CancellationToken.None);
 
         response.Should().Be("Hello there");
     }
