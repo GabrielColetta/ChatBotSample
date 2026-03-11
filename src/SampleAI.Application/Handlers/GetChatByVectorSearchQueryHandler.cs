@@ -7,18 +7,18 @@ using SampleAI.Shared.Models;
 
 namespace SampleAI.Application.Handlers;
 
-public class GetChatByConversationQueryHandler : IRequestHandler<GetChatByConversationQuery, PaginatedResponse<Conversation>>
+public class GetChatByVectorSearchQueryHandler : IRequestHandler<GetChatByVectorSearchQuery, PaginatedResponse<Conversation>>
 {
     private readonly IEmbeddingService _embeddingService;
     private readonly IConversationRepository _conversationRepository;
 
-    public GetChatByConversationQueryHandler(IEmbeddingService embeddingService, IConversationRepository conversationRepository)
+    public GetChatByVectorSearchQueryHandler(IEmbeddingService embeddingService, IConversationRepository conversationRepository)
     {
         _embeddingService = embeddingService;
         _conversationRepository = conversationRepository;
     }
 
-    public async Task<PaginatedResponse<Conversation>> Handle(GetChatByConversationQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<Conversation>> Handle(GetChatByVectorSearchQuery request, CancellationToken cancellationToken)
     {
         var embeddings = await _embeddingService.GetEmbeddingFromModelAsync(request.Search, cancellationToken);
 

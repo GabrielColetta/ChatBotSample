@@ -1,4 +1,3 @@
-using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SampleAI.Domain.Entities;
@@ -8,13 +7,13 @@ using SampleAI.Shared.Constants;
 using SampleAI.Shared.Filters;
 using SampleAI.Shared.Models;
 using System.Linq.Expressions;
-using System.Numerics;
 
 namespace SampleAI.Infrastructure.MongoDB.Repositories;
 
 public class ConversationRepository : IConversationRepository
 {
     private const double MinScore = 0.7;
+
     private readonly IMongoCollection<Conversation> _collection;
 
     public ConversationRepository(IMongoClient mongoClient)
@@ -28,10 +27,12 @@ public class ConversationRepository : IConversationRepository
         await _collection.InsertOneAsync(entity, null, cancellationToken);
     }
 
-    public async Task<PaginatedResponse<Conversation>> GetPaginatedAsync(
+    public async Task<PaginatedResponse<TResponse>> GetPaginatedAsync<TResponse>(
         Expression<Func<Conversation, bool>> predicate,
+        Expression<Func<Conversation, TResponse>> selector,
         PaginateFilter paginateFilter,
         CancellationToken cancellationToken)
+        where TResponse : class
     {
         var query = _collection
             .AsQueryable()
@@ -43,9 +44,10 @@ public class ConversationRepository : IConversationRepository
             .OrderBy(x => x.Date)
             .Skip(paginateFilter.CurrentPage * paginateFilter.PerPage)
             .Take(paginateFilter.PerPage)
+            .Select(selector)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedResponse<Conversation>(response, paginateFilter.PerPage, paginateFilter.CurrentPage, totalItems);
+        return new PaginatedResponse<TResponse>(response, paginateFilter.PerPage, paginateFilter.CurrentPage, totalItems);
     }
 
     public async Task<PaginatedResponse<Conversation>> VectorSearchAsync(
@@ -56,11 +58,8 @@ public class ConversationRepository : IConversationRepository
         double[] queryVector = Array.ConvertAll(embedding, x => (double)x);
 
         var projection = Builders<Conversation>.Projection
-            .Include(x => x.Id)
-            .Include(x => x.ChatRole)
             .Include(x => x.Date)
             .Include(x => x.Content)
-            .Include(x => x.ContentEmbedding)
             .Include(x => x.ChatId)
             .MetaVectorSearchScore(x => x.Score);
 
@@ -82,5 +81,4 @@ public class ConversationRepository : IConversationRepository
 
         return new PaginatedResponse<Conversation>(response, paginateFilter.PerPage, paginateFilter.CurrentPage, response.Count);
     }
-
 }

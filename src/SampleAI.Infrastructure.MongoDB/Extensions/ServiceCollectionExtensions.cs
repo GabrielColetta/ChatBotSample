@@ -69,7 +69,6 @@ public static class ServiceCollectionExtensions
                     .SetElementName(DatabaseConstants.ContentEmbedding)
                     .SetSerializer(new ArraySerializer<float>(new SingleSerializer(BsonType.Double)));
 
-                cm.UnmapProperty(c => c.Chat);
                 cm.MapProperty(c => c.Score)
                     .SetElementName("score")
                     .SetIgnoreIfNull(true);

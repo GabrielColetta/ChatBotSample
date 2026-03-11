@@ -37,7 +37,7 @@ public class ChatHubTests : IClassFixture<CustomWebApplicationFactory<Program>>
             .Build();
 
         var response = string.Empty;
-        connection.On<HistoryResponse>("ReceiveToken", r =>
+        connection.On<ConversationResponse>("ReceiveToken", r =>
         {
             response += r.Content;
         });

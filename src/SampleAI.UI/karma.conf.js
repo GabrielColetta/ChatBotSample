@@ -34,11 +34,22 @@
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
-    singleRun: false,
+    browsers: ['BraveHeadless'],
+    singleRun: true,
     restartOnFileChange: true,
     listenAddress: 'localhost',
-    hostname: 'localhost'
+    hostname: 'localhost',
+    customLaunchers: {
+      BraveHeadless: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--remote-debugging-port=9222'
+        ]
+      }
+    }
   });
 };
 

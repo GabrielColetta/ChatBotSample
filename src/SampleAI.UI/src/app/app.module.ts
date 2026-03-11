@@ -13,7 +13,7 @@ import Aura from '@primeng/themes/aura';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ChatComponent } from './chat/chat.component';
-import { HistoryComponent } from './history/history.component';
+import { ConversationComponent } from './conversation/conversation.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
@@ -27,7 +27,7 @@ import { CardModule } from 'primeng/card';
   declarations: [
     AppComponent,
     ChatComponent,
-    HistoryComponent
+    ConversationComponent
   ],
   imports: [
     BrowserModule,

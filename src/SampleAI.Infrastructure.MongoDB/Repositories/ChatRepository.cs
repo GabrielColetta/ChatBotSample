@@ -22,16 +22,11 @@ public class ChatRepository : IChatRepository
         _conversationCollection = database.GetCollection<Conversation>(DatabaseConstants.ConversationCollection);
     }
 
-    public Task CommitAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
     public async Task CreateAsync(Chat entity, CancellationToken cancellationToken)
     {
         await _collection.InsertOneAsync(entity, null, cancellationToken);
-        
-        if (entity.Conversations.Any())
+
+        if (entity.Conversations.Count != 0)
         {
             await _conversationCollection.InsertManyAsync(entity.Conversations, null, cancellationToken);
         }
@@ -44,10 +39,12 @@ public class ChatRepository : IChatRepository
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<PaginatedResponse<Chat>> GetPaginatedAsync(
+    public async Task<PaginatedResponse<TResponse>> GetPaginatedAsync<TResponse>(
         Expression<Func<Chat, bool>> predicate,
+        Expression<Func<Chat, TResponse>> selector,
         PaginateFilter paginateFilter,
         CancellationToken cancellationToken)
+        where TResponse : class
     {
         var query = _collection
             .AsQueryable()
@@ -59,8 +56,9 @@ public class ChatRepository : IChatRepository
             .OrderByDescending(x => x.Date)
             .Skip(paginateFilter.CurrentPage * paginateFilter.PerPage)
             .Take(paginateFilter.PerPage)
+            .Select(selector)
             .ToListAsync(cancellationToken);
 
-        return new PaginatedResponse<Chat>(response, paginateFilter.PerPage, paginateFilter.CurrentPage, totalItems);
+        return new PaginatedResponse<TResponse>(response, paginateFilter.PerPage, paginateFilter.CurrentPage, totalItems);
     }
 }

@@ -1,68 +1,86 @@
-import { Component, OnInit } from '@angular/core';
-import { SignalRService } from '../services/signalr-service';
-import { IChatResponse } from './chat.response';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { ActivatedRoute } from '@angular/router';
-import { ChatRole } from '../shared/enums/chat-role.enum';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpService } from '../services/http-service';
 import { PaginatedResponseModel } from '../shared/models/paginated-response.model';
+import { IChatResponse } from './chat.response';
+import { Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged, Subject, Subscription } from 'rxjs';
 
 @Component({
   standalone: false,
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit {
-  items: MenuItem[] = [
-    { label: 'home' },
-    { label: 'chat' }
-  ];
-  userForm: FormGroup<any>;
+export class ChatComponent implements OnInit, OnDestroy {
 
-  private chatId: string | null = null;
-  messages: IChatResponse[] = [];
+  items: MenuItem[] | undefined;
+  chats: IChatResponse[] = [];
+  private searchSubject = new Subject<string>();
+  private searchSubscription: Subscription | undefined;
 
-  constructor(private signalRService: SignalRService, private route: ActivatedRoute, private formBuilder: FormBuilder, private httpService: HttpService) {
-    this.userForm = this.formBuilder.group({
-      message: ['', [Validators.required, Validators.max(300)]]
-    });
+  constructor(private httpService: HttpService, private router: Router) {
+
   }
 
   ngOnInit(): void {
-    const chatId = this.route.snapshot.paramMap.get('chatId');
-    if (chatId !== null) {
-      this.chatId = chatId;
-      this.httpService
-        .getById('conversation', chatId)
-        .subscribe((response: PaginatedResponseModel<IChatResponse>) => {
-          this.messages = response.data;
-        });
-    }
+    this.items = [
+      { label: 'home' },
+    ];
 
-    this.signalRService.messageReceived$.subscribe((response: IChatResponse) => {
-      this.messages[this.messages.length - 1].content += response.content;
-    });
+    this.loadInitialHistory();
 
-    this.route.queryParamMap.subscribe(params => {
-      const initialMessage = params.get('message');
-      if (initialMessage) {
-        this.userForm.patchValue({ message: initialMessage });
-        // Small delay to ensure SignalR connection is ready
-        setTimeout(() => this.submitForm(), 500);
-      }
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(2000),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.performSearch(term);
     });
   }
 
-  submitForm(): void {
-    if (this.userForm.valid) {
-      const message = this.userForm.get('message')!.value;
-      if (message.trim() !== '') {
-        this.messages.push({ chatRole: ChatRole.User, content: message, chatId: this.chatId });
-        this.messages.push({ chatRole: ChatRole.Assistant, content: '', chatId: this.chatId });
-        this.signalRService.sendMessage(message, this.chatId);
-        this.userForm.reset();
-      }
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
     }
+  }
+
+  loadInitialHistory() {
+    this.httpService
+      .getPaginated('chat', {
+        perPage: 20,
+        currentPage: 0
+      })
+      .subscribe((response: PaginatedResponseModel<IChatResponse>) => {
+        this.chats = response.data;
+      });
+  }
+
+  onSearch(event: Event) {
+    const term = (event.target as HTMLInputElement).value;
+    this.searchSubject.next(term);
+  }
+
+  performSearch(search: string) {
+    if (!search.trim()) {
+      this.loadInitialHistory();
+      return;
+    }
+
+    this.httpService
+      .search('chat/search', search)
+      .subscribe((response: PaginatedResponseModel<any>) => {
+        this.chats = response.data.map((item: any) => ({
+          chatId: item.chatId,
+          title: item.content,
+          date: item.date
+        }));
+      });
+  }
+
+  continueChat(chatId: string) {
+    this.router.navigate(['/conversation', chatId]);
+  }
+
+  newChat() {
+    this.router.navigate(['/conversation']);
   }
 }

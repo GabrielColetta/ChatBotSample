@@ -43,4 +43,28 @@ public class ChatController : ControllerBase
             throw;
         }
     }
+
+    /// <summary>
+    /// Get the chat paginated using the vector search with the search parameter.
+    /// </summary>
+    /// <param name="search">The text to search</param>
+    /// <param name="cancellationToken">The Cancellation Token</param>
+    /// <returns></returns>
+    [HttpGet("search")]
+    public async Task<IActionResult> GetByVectorSearchAsync([FromQuery] string search, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = new GetChatByVectorSearchQuery(new PaginateFilter(PerPage, CurrentPage), search);
+
+            var paginatedResponse = await _mediator.Send(response, cancellationToken);
+
+            return Ok(ChatPaginatedResponse.From(paginatedResponse));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "{Message}", ex.Message);
+            throw;
+        }
+    }
 }

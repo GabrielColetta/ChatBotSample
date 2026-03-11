@@ -12,7 +12,6 @@ public class Conversation
     public double? Score { get; set; }
 
     public Guid ChatId { get; init; }
-    public Chat Chat { get; init; }
 
     public Conversation()
     {

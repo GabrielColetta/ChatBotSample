@@ -1,0 +1,21 @@
+<p-breadcrumb class="max-w-full" [model]="items" />
+
+<p-card header="Chat">
+  <div *ngFor="let message of messages" class="message">
+    <p-fieldset legend="{{ message.chatRole }}">
+      <p class="m-0">
+        {{ message.content }}
+      </p>
+    </p-fieldset>
+  </div>
+  <br />
+  <form [formGroup]="userForm" (ngSubmit)="submitForm()">
+    <div class="form-group">
+      <textarea rows="5" cols="30" pTextarea [autoResize]="true" pSize="large" placeholder="Type a message..." required class="form-control" formControlName="message"></textarea>
+    </div>
+    <br>
+    <div>
+      <p-button type="submit" icon="pi pi-plus" class="mr-2" text label="Send Message" />
+    </div>
+  </form>
+</p-card>

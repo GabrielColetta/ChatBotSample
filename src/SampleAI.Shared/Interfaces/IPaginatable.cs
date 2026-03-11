@@ -7,8 +7,10 @@ namespace SampleAI.Shared.Interfaces;
 public interface IPaginatable<TEntity>
     where TEntity : class
 {
-    Task<PaginatedResponse<TEntity>> GetPaginatedAsync(
+    Task<PaginatedResponse<TResponse>> GetPaginatedAsync<TResponse>(
         Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, TResponse>> selector,
         PaginateFilter paginateFilter,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken)
+        where TResponse : class;
 }

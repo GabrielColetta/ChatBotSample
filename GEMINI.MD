@@ -79,6 +79,6 @@ The project follows **Clean Architecture** principles, separating concerns into 
 
 ### 🧪 Testing & Validation
 - **Mandatory Verification:** For every code change, **all existing tests must be executed** to ensure no regressions and guarantee that the system remains fully functional.
-- **Always Verify Build and Tests:** Every time code is changed, you **must run `dotnet run` and `dotnet test`** to ensure the application starts correctly and all verification logic passes.
+- **Always Verify Build and Tests:** Every time C# code is changed, you **must run `dotnet run` and `dotnet test`** to ensure the application starts correctly and all verification logic passes. Additionally, for any changes to component files in the `SampleAI.UI` project, you **must run `npm test`**.
 - **Unit Testing for Use Cases:** Every new use case or business logic modification within the `SampleAI.Application` or `SampleAI.Domain` layers **must be accompanied by corresponding unit tests**.
 - **Test-Driven Standards:** Use existing patterns (NSubstitute for mocking, FluentAssertions for clarity) to maintain the quality and reliability of the codebase.

@@ -5,4 +5,4 @@ using SampleAI.Shared.Models;
 
 namespace SampleAI.Application.Contracts.Queries;
 
-public record GetChatPaginatedQuery(PaginateFilter PaginateFilter) : IRequest<PaginatedResponse<GetChatResponse>>;
+public record GetConversationByIdQuery(PaginateFilter Filter, Guid ChatId) : IRequest<PaginatedResponse<GetConversationByIdResponse>>;

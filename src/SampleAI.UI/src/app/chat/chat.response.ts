@@ -1,5 +1,5 @@
 export interface IChatResponse {
-  chatRole: string;
-  content: string;
-  chatId: string | null;
+  chatId: string;
+  title: string;
+  date: string;
 }

@@ -24,30 +24,6 @@ public class ConversationController : ControllerBase
     }
 
     /// <summary>
-    /// Get the conversation paginated using the vector search with the search parameter.
-    /// </summary>
-    /// <param name="search">The text to search</param>
-    /// <param name="cancellationToken">The Cancellation Token</param>
-    /// <returns></returns>
-    [HttpGet]
-    public async Task<IActionResult> GetChatByConversationAsync([FromQuery] string search, CancellationToken cancellationToken)
-    {
-        try
-        {
-            var response = new GetChatByConversationQuery(new PaginateFilter(PerPage, CurrentPage), search);
-
-            var paginatedResponse = await _mediator.Send(response, cancellationToken);
-
-            return Ok(HistoryResponse.From(paginatedResponse));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "{Message}", ex.Message);
-            throw;
-        }
-    }
-
-    /// <summary>
     /// Get the conversation paginated by id.
     /// </summary>
     /// <param name="chatId">The chat unique identifier</param>
@@ -58,11 +34,11 @@ public class ConversationController : ControllerBase
     {
         try
         {
-            var response = new GetConversationQuery(new PaginateFilter(PerPage, CurrentPage), chatId);
+            var response = new GetConversationByIdQuery(new PaginateFilter(PerPage, CurrentPage), chatId);
 
             var paginatedResponse = await _mediator.Send(response, cancellationToken);
 
-            return Ok(HistoryResponse.From(paginatedResponse));
+            return Ok(ConversationResponse.From(paginatedResponse));
         }
         catch (Exception ex)
         {

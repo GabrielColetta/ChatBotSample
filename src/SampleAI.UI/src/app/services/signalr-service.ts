@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { IChatResponse } from '../chat/chat.response';
 import { environment } from '../../environments/environment';
+import { IConversationResponse } from '../conversation/conversation.response';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ import { environment } from '../../environments/environment';
 export class SignalRService {
   private connection!: signalR.HubConnection;
 
-  private messageReceived = new Subject<IChatResponse>();
+  private messageReceived = new Subject<IConversationResponse>();
   messageReceived$ = this.messageReceived.asObservable();
 
 
@@ -25,7 +25,7 @@ export class SignalRService {
       })
       .build();
 
-    this.connection.on('ReceiveToken', (item: IChatResponse) => {
+    this.connection.on('ReceiveToken', (item: IConversationResponse) => {
       this.messageReceived.next(item);
     });
 

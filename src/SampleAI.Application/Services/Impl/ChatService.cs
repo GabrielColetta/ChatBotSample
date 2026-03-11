@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.AI;
+using SampleAI.Application.Contracts.Responses;
 using SampleAI.Domain.Entities;
 using SampleAI.Domain.Interfaces;
 using SampleAI.Shared.Filters;
@@ -98,6 +99,7 @@ public class ChatService : IChatService
 
         var response = await _conversationRepository.GetPaginatedAsync(
             GetPredicate(chatId),
+            GetSelector(),
             paginateFilter,
             cancellationToken);
 
@@ -110,5 +112,10 @@ public class ChatService : IChatService
     private static Expression<Func<Conversation, bool>> GetPredicate(Guid chatId)
     {
         return x => x.ChatId == chatId;
+    }
+
+    private static Expression<Func<Conversation, GetConversationByIdResponse>> GetSelector()
+    {
+        return x => new GetConversationByIdResponse(x.Id, x.ChatRole.ToString(), x.Date, x.Content);
     }
 }
